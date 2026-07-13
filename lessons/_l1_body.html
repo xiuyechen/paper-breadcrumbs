@@ -1,0 +1,518 @@
+<title>What a Jacobian Actually Is</title>
+<style>
+  :root {
+    --paper: #f3f0e9;
+    --paper-panel: #ece7dc;
+    --ink: #1b2330;
+    --ink-soft: #46505f;
+    --ink-faint: #7c8492;
+    --rule: #d8d2c4;
+    --rule-strong: #c3bcac;
+    /* two roles: input nudge (amber) vs output response (teal) */
+    --in: #b3672c;
+    --in-bg: #f2e2cf;
+    --out: #0c7d7d;
+    --out-bg: #d5e8e6;
+    --accent: #0c7d7d;
+    --shadow: rgba(27,35,48,.09);
+    --serif: "Palatino", "Palatino Linotype", "Book Antiqua", Charter, Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12151c;
+      --paper-panel: #191d26;
+      --ink: #e8e6df;
+      --ink-soft: #b0b4bd;
+      --ink-faint: #79808c;
+      --rule: #2a2f3a;
+      --rule-strong: #3a404d;
+      --in: #e2965a;
+      --in-bg: #33261a;
+      --out: #4ec4c0;
+      --out-bg: #16302f;
+      --accent: #4ec4c0;
+      --shadow: rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #f3f0e9; --paper-panel: #ece7dc; --ink: #1b2330; --ink-soft: #46505f;
+    --ink-faint: #7c8492; --rule: #d8d2c4; --rule-strong: #c3bcac;
+    --in: #b3672c; --in-bg: #f2e2cf; --out: #0c7d7d; --out-bg: #d5e8e6;
+    --accent: #0c7d7d; --shadow: rgba(27,35,48,.09);
+  }
+  :root[data-theme="dark"] {
+    --paper: #12151c; --paper-panel: #191d26; --ink: #e8e6df; --ink-soft: #b0b4bd;
+    --ink-faint: #79808c; --rule: #2a2f3a; --rule-strong: #3a404d;
+    --in: #e2965a; --in-bg: #33261a; --out: #4ec4c0; --out-bg: #16302f;
+    --accent: #4ec4c0; --shadow: rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem 6rem;
+  }
+
+  /* ---- header ---- */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: .72rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 1.1rem;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(2.3rem, 6vw, 3.2rem);
+    line-height: 1.08;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+    margin: 0 0 1rem;
+  }
+  .standfirst {
+    font-family: var(--serif);
+    font-size: 1.28rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 0 0 2.2rem;
+    max-width: 40ch;
+  }
+  .rule { height: 1px; background: var(--rule); border: 0; margin: 2.6rem 0; }
+
+  /* ---- section headings ---- */
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.7rem;
+    line-height: 1.2;
+    letter-spacing: -.01em;
+    margin: 3.2rem 0 .3rem;
+    display: flex;
+    align-items: baseline;
+    gap: .7rem;
+  }
+  h2 .num {
+    font-family: var(--mono);
+    font-size: .78rem;
+    font-weight: 400;
+    letter-spacing: .1em;
+    color: var(--accent);
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    padding: .12em .5em;
+    position: relative;
+    top: -.2em;
+    flex: none;
+  }
+  p { margin: 1.1rem 0; }
+  strong { font-weight: 640; }
+
+  .in-word  { color: var(--in);  font-weight: 640; }
+  .out-word { color: var(--out); font-weight: 640; }
+
+  /* ---- callout / question boxes ---- */
+  .quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.24rem;
+    line-height: 1.45;
+    color: var(--ink);
+    border-left: 3px solid var(--accent);
+    padding: .2rem 0 .2rem 1.3rem;
+    margin: 1.8rem 0;
+  }
+
+  /* ---- math panels ---- */
+  .panel {
+    background: var(--paper-panel);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 1.6rem 1.4rem;
+    margin: 1.8rem 0;
+    overflow-x: auto;
+  }
+  .panel .cap {
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 1rem;
+  }
+  .formula {
+    font-family: var(--mono);
+    font-size: 1.15rem;
+    color: var(--ink);
+    text-align: center;
+    line-height: 2;
+  }
+
+  /* fractions */
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0 .15em;
+    line-height: 1.15;
+    font-size: .82em;
+  }
+  .frac .top { border-bottom: 1.4px solid currentColor; padding: 0 .35em .06em; }
+  .frac .bot { padding: .06em .35em 0; }
+  .partial { font-style: italic; }
+
+  /* matrix */
+  .matrix-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55em;
+    flex-wrap: wrap;
+  }
+  .mat {
+    display: inline-flex;
+    align-items: stretch;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .mat .bracket {
+    width: .7em;
+    border: 2.2px solid var(--ink-soft);
+  }
+  .mat .bracket.l { border-right: 0; border-radius: 5px 0 0 5px; }
+  .mat .bracket.r { border-left: 0; border-radius: 0 5px 5px 0; }
+  .mat .grid {
+    display: grid;
+    padding: .5em .55em;
+    gap: .35em 1.1em;
+  }
+  .mat .cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.9em;
+    font-size: .95rem;
+  }
+  .label-eq { font-family: var(--mono); font-size: 1.1rem; margin: 0 .2em; }
+
+  /* dimension tags under matrix */
+  .dims {
+    font-family: var(--mono);
+    font-size: .74rem;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-top: .9rem;
+    letter-spacing: .04em;
+  }
+  .dims b.out { color: var(--out); }
+  .dims b.in  { color: var(--in);  }
+
+  /* inline code-ish variables */
+  var, .v {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: .92em;
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    padding: .05em .35em;
+    border-radius: 3px;
+  }
+
+  /* ---- interactive nudge widget ---- */
+  .demo {
+    background: var(--paper-panel);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1.7rem 1.5rem 1.9rem;
+    margin: 2rem 0;
+  }
+  .demo h3 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    margin: 0 0 .3rem;
+    font-weight: 600;
+  }
+  .demo .sub { color: var(--ink-soft); font-size: .95rem; margin: 0 0 1.3rem; }
+  .demo canvas { width: 100%; height: 230px; display: block; border-radius: 6px; }
+  .slider-row {
+    display: flex; align-items: center; gap: 1rem; margin-top: 1.2rem;
+    font-family: var(--mono); font-size: .82rem; color: var(--ink-soft);
+  }
+  .slider-row input[type=range] { flex: 1; accent-color: var(--in); }
+  .readout {
+    display: flex; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;
+    font-family: var(--mono); font-size: .85rem;
+  }
+  .readout .k { color: var(--ink-faint); }
+  .readout .vin  { color: var(--in);  font-weight: 640; }
+  .readout .vout { color: var(--out); font-weight: 640; }
+
+  /* ---- check questions ---- */
+  .check {
+    border: 1px solid var(--rule-strong);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem;
+    margin: 1.6rem 0;
+    background: var(--paper);
+  }
+  .check .qlabel {
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 .5rem;
+  }
+  .check p.q { margin: 0 0 1rem; font-weight: 500; }
+  .check button {
+    font-family: var(--sans);
+    font-size: .9rem;
+    font-weight: 560;
+    color: var(--paper);
+    background: var(--accent);
+    border: 0;
+    border-radius: 6px;
+    padding: .55em 1.1em;
+    cursor: pointer;
+    transition: transform .08s ease, filter .15s ease;
+  }
+  .check button:hover { filter: brightness(1.08); }
+  .check button:active { transform: translateY(1px); }
+  .check button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .answer {
+    margin-top: 1.1rem;
+    padding-top: 1.1rem;
+    border-top: 1px dashed var(--rule-strong);
+    color: var(--ink-soft);
+    font-size: .97rem;
+    display: none;
+  }
+  .answer.show { display: block; animation: fade .3s ease; }
+  .answer strong { color: var(--ink); }
+  @keyframes fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+  .footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: .9rem;
+    color: var(--ink-faint);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Building up from what you know</p>
+  <h1>What a Jacobian actually is</h1>
+  <p class="standfirst">It&rsquo;s the ordinary derivative &mdash; the same &ldquo;nudge the input, watch the output move&rdquo; idea &mdash; grown up to handle vectors going in and vectors coming out.</p>
+
+  <hr class="rule">
+
+  <h2><span class="num">1</span> Start with one variable</h2>
+  <p>You already know the ordinary derivative. If <var>f(x) = x&sup2;</var>, then <var>f&prime;(x) = 2x</var>. That derivative answers exactly one question:</p>
+
+  <p class="quote">If I nudge the input a tiny bit, how much does the output move &mdash; and in which direction?</p>
+
+  <p>At <var>x = 3</var>, we get <var>f&prime;(3) = 6</var>. Read that as: near <var>x = 3</var>, push the <span class="in-word">input</span> up by a tiny amount <var>&epsilon;</var> and the <span class="out-word">output</span> rises by about <var>6&epsilon;</var>. The derivative is a <strong>local multiplier</strong> &mdash; the best straight-line stand-in for a curved function, right at one point.</p>
+
+  <p>That&rsquo;s the whole seed. Everything below is this one idea, generalized. Drag the nudge and watch it:</p>
+
+  <div class="demo">
+    <h3>The derivative is a local multiplier</h3>
+    <p class="sub">The curve is <var>f(x) = x&sup2;</var>. The straight line is its derivative at the dot &mdash; the function&rsquo;s best linear impersonation there. Move the input nudge; the output response is the multiplier times the nudge.</p>
+    <canvas id="cv" width="640" height="230"></canvas>
+    <div class="slider-row">
+      <span>point&nbsp;<b>x</b></span>
+      <input id="px" type="range" min="-2.6" max="2.6" step="0.01" value="1.4" aria-label="point x">
+      <span id="pxval">1.40</span>
+    </div>
+    <div class="readout">
+      <span><span class="k">slope f&prime;(x) = 2x = </span><span class="vout" id="slope">2.80</span></span>
+      <span><span class="k">nudge input </span><span class="vin">&Delta;x = +0.30</span></span>
+      <span><span class="k">&rarr; output moves </span><span class="vout" id="dy">&Delta;y &asymp; +0.84</span></span>
+    </div>
+  </div>
+
+  <h2><span class="num">2</span> Let the input and output be vectors</h2>
+  <p>An ordinary function takes one number in and gives one number out. But most interesting functions &mdash; including a layer of a neural network &mdash; take a whole <strong>vector</strong> in and hand back a <strong>vector</strong>.</p>
+
+  <p>Say a function <var>F</var> takes a 3-dimensional <span class="in-word">input</span> <var>(x&#8321;, x&#8322;, x&#8323;)</var> and produces a 2-dimensional <span class="out-word">output</span> <var>(y&#8321;, y&#8322;)</var>.</p>
+
+  <p>Now &ldquo;the derivative&rdquo; is trickier, because there are many directions to nudge and many outputs to watch. So the honest question splits into many copies of the <em>same</em> question:</p>
+
+  <p class="quote">If I nudge <span class="in-word">input component x<sub>j</sub></span>, how much does <span class="out-word">output component y<sub>i</sub></span> move?</p>
+
+  <p>There&rsquo;s one such number for <em>every pairing</em> of an output with an input. Here that&rsquo;s 2 outputs &times; 3 inputs = <strong>6 numbers</strong>. Each one is a partial derivative, written <span class="v">&part;y<sub>i</sub> / &part;x<sub>j</sub></span> &mdash; &ldquo;how <span class="out-word">y<sub>i</sub></span> responds to <span class="in-word">x<sub>j</sub></span>, holding the others still.&rdquo;</p>
+
+  <h2><span class="num">3</span> The Jacobian is just those numbers in a grid</h2>
+  <p>Arrange the six numbers in a matrix. <strong>Row = which output. Column = which input.</strong> That grid <em>is</em> the Jacobian:</p>
+
+  <div class="panel">
+    <p class="cap">Jacobian of F, evaluated at a point</p>
+    <div class="matrix-row">
+      <span class="label-eq">J =</span>
+      <span class="mat">
+        <span class="bracket l"></span>
+        <span class="grid" style="grid-template-columns: repeat(3, auto);">
+          <span class="cell"><span class="frac"><span class="top"><span class="partial">&part;</span>y&#8321;</span><span class="bot"><span class="partial">&part;</span>x&#8321;</span></span></span>
+          <span class="cell"><span class="frac"><span class="top"><span class="partial">&part;</span>y&#8321;</span><span class="bot"><span class="partial">&part;</span>x&#8322;</span></span></span>
+          <span class="cell"><span class="frac"><span class="top"><span class="partial">&part;</span>y&#8321;</span><span class="bot"><span class="partial">&part;</span>x&#8323;</span></span></span>
+          <span class="cell"><span class="frac"><span class="top"><span class="partial">&part;</span>y&#8322;</span><span class="bot"><span class="partial">&part;</span>x&#8321;</span></span></span>
+          <span class="cell"><span class="frac"><span class="top"><span class="partial">&part;</span>y&#8322;</span><span class="bot"><span class="partial">&part;</span>x&#8322;</span></span></span>
+          <span class="cell"><span class="frac"><span class="top"><span class="partial">&part;</span>y&#8322;</span><span class="bot"><span class="partial">&part;</span>x&#8323;</span></span></span>
+        </span>
+        <span class="bracket r"></span>
+      </span>
+    </div>
+    <p class="dims">rows &rarr; <b class="out">2 outputs</b> &nbsp;&bull;&nbsp; columns &rarr; <b class="in">3 inputs</b> &nbsp;&bull;&nbsp; shape = <b class="out">2</b>&thinsp;&times;&thinsp;<b class="in">3</b></p>
+  </div>
+
+  <p>That&rsquo;s the entire definition. <strong>A Jacobian is the derivative when both the input and the output are vectors: a matrix of &ldquo;how does each output respond to each input,&rdquo; evaluated at one point.</strong> The top-left entry, for instance, is how <span class="out-word">y&#8321;</span> responds to <span class="in-word">x&#8321;</span>.</p>
+
+  <h2><span class="num">4</span> The one property that makes it worth having</h2>
+  <p>Same punchline as the 1-D derivative. For a small <span class="in-word">input nudge</span> <var>&Delta;x</var> (now itself a vector), the <span class="out-word">output</span> moves by:</p>
+
+  <div class="panel">
+    <p class="cap">Best local linear approximation</p>
+    <p class="formula"><span class="out-word">&Delta;y</span> &nbsp;&asymp;&nbsp; J &nbsp;<span class="in-word">&Delta;x</span></p>
+  </div>
+
+  <p>Zoom in close enough to a point and the messy nonlinear <var>F</var> simply <em>acts like</em> multiplication by the matrix <var>J</var>. So the Jacobian tells you precisely how the function <strong>stretches, rotates, and squishes</strong> input-space in the neighborhood of that point. One matrix, standing in for the whole tangled function &mdash; locally.</p>
+
+  <hr class="rule">
+
+  <h2>Quick checks</h2>
+  <p style="color:var(--ink-soft); margin-top:.4rem;">The whole paper rides on this, so let&rsquo;s make sure it landed. Answer in your head, then reveal.</p>
+
+  <div class="check">
+    <p class="qlabel">Check 1 &mdash; shape</p>
+    <p class="q">If <var>F</var> maps a <span class="in-word">5-dimensional input</span> to a <span class="out-word">3-dimensional output</span>, what is the shape (rows &times; columns) of its Jacobian?</p>
+    <button onclick="reveal('a1')">Reveal answer</button>
+    <div class="answer" id="a1">
+      <p><strong><span class="out-word">3</span> &times; <span class="in-word">5</span></strong> &mdash; three rows (one per output component), five columns (one per input component). The rule is always <b class="out">outputs</b> &times; <b class="in">inputs</b>, in that order. So it holds <strong>15</strong> partial derivatives.</p>
+    </div>
+  </div>
+
+  <div class="check">
+    <p class="qlabel">Check 2 &mdash; meaning of one entry</p>
+    <p class="q">In that same <span class="out-word">3</span>&times;<span class="in-word">5</span> Jacobian, what does the entry in <strong>row 2, column 4</strong> tell you?</p>
+    <button onclick="reveal('a2')">Reveal answer</button>
+    <div class="answer" id="a2">
+      <p>It is <span class="v">&part;y&#8322; / &part;x&#8324;</span>: <strong>how much the 2nd <span class="out-word">output</span> component moves when you nudge the 4th <span class="in-word">input</span> component</strong> (holding the other inputs fixed). Row picks the output; column picks the input.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Next: why &ldquo;transport a hidden activation into the final-layer basis via&nbsp;<var>J</var>&rdquo; &mdash; the J-lens formula <span class="v">lens(h) = unembed(J&thinsp;&middot;&thinsp;h)</span> &mdash; is exactly this idea applied to a transformer. That&rsquo;s where the global-workspace paper picks up.</p>
+  </div>
+
+</div>
+
+<script>
+  function reveal(id){ document.getElementById(id).classList.add('show'); }
+
+  // ---- interactive parabola + tangent ----
+  (function(){
+    var cv = document.getElementById('cv');
+    if(!cv) return;
+    var ctx = cv.getContext('2d');
+    var px = document.getElementById('px');
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+    function resize(){
+      var w = cv.clientWidth, h = cv.clientHeight;
+      cv.width = w * DPR; cv.height = h * DPR;
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+      draw();
+    }
+
+    var NUDGE = 0.30; // fixed Δx for illustration
+
+    function draw(){
+      var w = cv.clientWidth, h = cv.clientHeight;
+      ctx.clearRect(0,0,w,h);
+
+      var ink = css('--ink'), soft = css('--ink-faint'), rule = css('--rule');
+      var IN = css('--in'), OUT = css('--out');
+
+      // world: x in [-2.8,2.8], y in [-0.6, 7.6]  (f=x^2)
+      var xmin=-2.8, xmax=2.8, ymin=-0.6, ymax=7.6;
+      var pad = 8;
+      function sx(x){ return pad + (x - xmin)/(xmax-xmin) * (w-2*pad); }
+      function sy(y){ return (h-pad) - (y - ymin)/(ymax-ymin) * (h-2*pad); }
+
+      // axes
+      ctx.strokeStyle = rule; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(sx(xmin), sy(0)); ctx.lineTo(sx(xmax), sy(0)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx(0), sy(ymin)); ctx.lineTo(sx(0), sy(ymax)); ctx.stroke();
+
+      // parabola
+      ctx.strokeStyle = ink; ctx.lineWidth = 2;
+      ctx.beginPath();
+      for(var i=0;i<=200;i++){
+        var x = xmin + (xmax-xmin)*i/200;
+        var y = x*x;
+        if(i===0) ctx.moveTo(sx(x), sy(y)); else ctx.lineTo(sx(x), sy(y));
+      }
+      ctx.stroke();
+
+      var x0 = parseFloat(px.value);
+      var y0 = x0*x0;
+      var slope = 2*x0;
+
+      // tangent line across view
+      ctx.strokeStyle = OUT; ctx.lineWidth = 2; ctx.setLineDash([6,5]);
+      var xl = xmin, xr = xmax;
+      ctx.beginPath();
+      ctx.moveTo(sx(xl), sy(y0 + slope*(xl-x0)));
+      ctx.lineTo(sx(xr), sy(y0 + slope*(xr-x0)));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // nudge segment: horizontal Δx (input) then vertical Δy (output) along tangent
+      var x1 = x0 + NUDGE;
+      var yTan1 = y0 + slope*NUDGE;
+      // input arrow (amber) along x at height y0
+      ctx.strokeStyle = IN; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(sx(x0), sy(y0)); ctx.lineTo(sx(x1), sy(y0)); ctx.stroke();
+      // output arrow (teal) vertical rise
+      ctx.strokeStyle = OUT; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(sx(x1), sy(y0)); ctx.lineTo(sx(x1), sy(yTan1)); ctx.stroke();
+
+      // point
+      ctx.fillStyle = ink;
+      ctx.beginPath(); ctx.arc(sx(x0), sy(y0), 4.5, 0, 7); ctx.fill();
+
+      // update readouts
+      document.getElementById('pxval').textContent = x0.toFixed(2);
+      document.getElementById('slope').textContent = slope.toFixed(2);
+      document.getElementById('dy').textContent = 'Δy ≈ ' + (slope>=0?'+':'') + (slope*NUDGE).toFixed(2);
+    }
+
+    px.addEventListener('input', draw);
+    window.addEventListener('resize', resize);
+    resize();
+    // redraw on theme toggle (data-theme attr changes)
+    new MutationObserver(draw).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+    if(window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+  })();
+</script>

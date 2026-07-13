@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Paper Breadcrumbs &mdash; a trail into the global-workspace paper</title>
+<style>
+  :root {
+    --paper: #f3f0e9;
+    --paper-panel: #ece7dc;
+    --ink: #1b2330;
+    --ink-soft: #46505f;
+    --ink-faint: #7c8492;
+    --rule: #d8d2c4;
+    --rule-strong: #c3bcac;
+    --in: #b3672c;
+    --in-bg: #f2e2cf;
+    --out: #0c7d7d;
+    --out-bg: #d5e8e6;
+    --accent: #0c7d7d;
+    --violet: #6a4fb0;
+    --shadow: rgba(27,35,48,.10);
+    --serif: "Palatino", "Palatino Linotype", "Book Antiqua", Charter, Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12151c; --paper-panel: #191d26; --ink: #e8e6df; --ink-soft: #b0b4bd;
+      --ink-faint: #79808c; --rule: #2a2f3a; --rule-strong: #3a404d;
+      --in: #e2965a; --in-bg: #33261a; --out: #4ec4c0; --out-bg: #16302f;
+      --accent: #4ec4c0; --violet: #a48cf0; --shadow: rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #f3f0e9; --paper-panel: #ece7dc; --ink: #1b2330; --ink-soft: #46505f;
+    --ink-faint: #7c8492; --rule: #d8d2c4; --rule-strong: #c3bcac;
+    --in: #b3672c; --in-bg: #f2e2cf; --out: #0c7d7d; --out-bg: #d5e8e6;
+    --accent: #0c7d7d; --violet: #6a4fb0; --shadow: rgba(27,35,48,.10);
+  }
+  :root[data-theme="dark"] {
+    --paper: #12151c; --paper-panel: #191d26; --ink: #e8e6df; --ink-soft: #b0b4bd;
+    --ink-faint: #79808c; --rule: #2a2f3a; --rule-strong: #3a404d;
+    --in: #e2965a; --in-bg: #33261a; --out: #4ec4c0; --out-bg: #16302f;
+    --accent: #4ec4c0; --violet: #a48cf0; --shadow: rgba(0,0,0,.45);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--sans); font-size: 18px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* nav */
+  .pbn {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: .7rem 1.5rem;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(8px);
+    -webkit-backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .06em;
+  }
+  .pbn .brand { text-transform: uppercase; letter-spacing: .16em; color: var(--ink-faint); }
+  .pbn button.tt {
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .04em;
+    background: transparent; color: var(--ink-soft);
+    border: 1px solid var(--rule-strong); border-radius: 6px;
+    padding: .35em .8em; cursor: pointer; transition: color .15s, border-color .15s;
+  }
+  .pbn button.tt:hover { color: var(--accent); border-color: var(--accent); }
+  .pbn button.tt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+
+  /* hero */
+  .hero { margin-bottom: 3.5rem; }
+  .kicker {
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 1.2rem;
+    display: flex; align-items: center; gap: .7rem;
+  }
+  .kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  h1 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(2.6rem, 7vw, 4rem); line-height: 1.04;
+    letter-spacing: -.015em; text-wrap: balance; margin: 0 0 1.2rem;
+  }
+  .lede {
+    font-family: var(--serif); font-size: 1.35rem; line-height: 1.5;
+    color: var(--ink-soft); font-style: italic; margin: 0; max-width: 44ch;
+  }
+  .meta {
+    margin-top: 1.8rem; font-family: var(--mono); font-size: .8rem;
+    color: var(--ink-faint); letter-spacing: .03em; line-height: 1.9;
+  }
+  .meta b { color: var(--ink-soft); font-weight: 600; }
+
+  /* the trail */
+  .trail { position: relative; margin: 0; padding: 0; }
+  .trail::before {
+    content: ""; position: absolute; left: 27px; top: 34px; bottom: 90px;
+    width: 2px;
+    background: repeating-linear-gradient(var(--rule-strong) 0 6px, transparent 6px 13px);
+  }
+  .node {
+    position: relative; display: grid;
+    grid-template-columns: 56px 1fr; gap: 0 1.3rem;
+    padding: 0 0 2.2rem; align-items: start;
+    text-decoration: none; color: inherit;
+  }
+  .node .marker {
+    position: relative; z-index: 2;
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 1.05rem; font-weight: 600;
+    background: var(--paper); border: 2px solid var(--rule-strong);
+    color: var(--ink-soft); flex: none;
+    transition: transform .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+  }
+  .card {
+    background: var(--paper-panel);
+    border: 1px solid var(--rule); border-radius: 12px;
+    padding: 1.3rem 1.5rem;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  a.node:hover .card {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px -12px var(--shadow);
+    border-color: var(--rule-strong);
+  }
+  a.node:hover .marker {
+    transform: scale(1.06);
+    border-color: var(--accent); color: var(--accent);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  a.node:focus-visible { outline: none; }
+  a.node:focus-visible .card { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .card .tag {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 .5rem;
+  }
+  .card h2 {
+    font-family: var(--serif); font-weight: 600; font-size: 1.4rem; line-height: 1.2;
+    letter-spacing: -.01em; margin: 0 0 .5rem; text-wrap: balance;
+  }
+  .card p { margin: 0; color: var(--ink-soft); font-size: 1rem; line-height: 1.5; }
+  .card .foot {
+    margin-top: .9rem; display: flex; gap: 1.1rem; flex-wrap: wrap;
+    font-family: var(--mono); font-size: .72rem; color: var(--ink-faint); letter-spacing: .04em;
+  }
+  .card .foot .go { color: var(--accent); font-weight: 600; }
+
+  /* destination node = the paper */
+  .node.dest .marker {
+    background: var(--out-bg); border-color: var(--out); color: var(--out);
+    font-size: 1.4rem;
+  }
+  .node.dest .card {
+    background: color-mix(in srgb, var(--out) 7%, var(--paper-panel));
+    border-color: color-mix(in srgb, var(--out) 32%, var(--rule));
+  }
+  .node.dest .card .tag { color: var(--out); }
+  a.node.dest:hover .marker {
+    border-color: var(--out); color: var(--out);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--out) 16%, transparent);
+  }
+  .paper-authors { font-style: italic; color: var(--ink-faint); font-family: var(--serif); font-size: .95rem; }
+  .dest-links { margin-top: 1rem; display: flex; gap: .6rem; flex-wrap: wrap; }
+  .dest-links a {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .03em;
+    text-decoration: none; color: var(--out);
+    border: 1px solid color-mix(in srgb, var(--out) 40%, var(--rule));
+    border-radius: 6px; padding: .4em .8em; transition: background .15s, color .15s;
+  }
+  .dest-links a:hover { background: var(--out); color: var(--paper); }
+
+  /* about strip */
+  .about {
+    margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--rule);
+    color: var(--ink-soft); font-size: .98rem;
+  }
+  .about h3 { font-family: var(--serif); font-size: 1.15rem; margin: 0 0 .6rem; color: var(--ink); font-weight: 600; }
+  .about p { margin: .7rem 0; max-width: 62ch; }
+  .about code {
+    font-family: var(--mono); font-size: .85em;
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    padding: .1em .4em; border-radius: 4px;
+  }
+  .footer {
+    margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
+    font-family: var(--mono); font-size: .74rem; color: var(--ink-faint);
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; letter-spacing: .04em;
+  }
+  .footer a { color: var(--ink-soft); text-decoration: none; }
+  .footer a:hover { color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  @media (max-width: 540px) {
+    .node { grid-template-columns: 44px 1fr; gap: 0 1rem; }
+    .node .marker { width: 44px; height: 44px; font-size: .9rem; }
+    .trail::before { left: 21px; }
+  }
+</style>
+</head>
+<body>
+<nav class="pbn">
+  <span class="brand">paper breadcrumbs</span>
+  <button class="tt" onclick="pbTheme()" aria-label="Toggle light or dark theme">theme</button>
+</nav>
+
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker"><span class="dot"></span> a trail of mini-lessons</p>
+    <h1>Breadcrumbs into a paper</h1>
+    <p class="lede">Short, interactive lessons that lay down one idea at a time &mdash; each a step on a trail that ends at the paper itself, now readable.</p>
+    <p class="meta">
+      <b>Trail 01</b> &nbsp;&middot;&nbsp; The global workspace inside a language model<br>
+      built from what you already know &nbsp;&middot;&nbsp; ~10 min per step &nbsp;&middot;&nbsp; interactive
+    </p>
+  </header>
+
+  <main class="trail">
+
+    <a class="node" href="lessons/01-jacobian.html">
+      <div class="marker">1</div>
+      <div class="card">
+        <p class="tag">the math object</p>
+        <h2>What a Jacobian actually is</h2>
+        <p>The ordinary derivative &mdash; &ldquo;nudge the input, watch the output move&rdquo; &mdash; grown up to handle vectors in and vectors out. With a live tangent-line you can drag.</p>
+        <div class="foot"><span>calculus &rarr; linear algebra</span><span class="go">start here &rarr;</span></div>
+      </div>
+    </a>
+
+    <a class="node" href="lessons/02-jlens.html">
+      <div class="marker">2</div>
+      <div class="card">
+        <p class="tag">the instrument</p>
+        <h2>Why &ldquo;transport a hidden activation into the final-layer basis via&nbsp;J&rdquo;</h2>
+        <p>Point the Jacobian from mid-stack to the model&rsquo;s exit and it becomes a lens &mdash; a readout of what a buried thought is disposed to make the model say. Click down the layers and watch a thought resolve into words.</p>
+        <div class="foot"><span>transformers &middot; interpretability</span><span class="go">continue &rarr;</span></div>
+      </div>
+    </a>
+
+    <div class="node" style="opacity:.62; cursor:default;">
+      <div class="marker" style="border-style:dashed;">3</div>
+      <div class="card" style="background:transparent; border-style:dashed;">
+        <p class="tag" style="color:var(--ink-faint);">coming next</p>
+        <h2 style="color:var(--ink-soft);">The four tests that make it a &ldquo;workspace&rdquo;</h2>
+        <p>Verbal report, directed modulation, internal reasoning, flexible generalization &mdash; the criteria that promote &ldquo;the lens finds verbalizable representations&rdquo; into &ldquo;these form a global workspace.&rdquo; And then: could a <em>beauty axis</em> live there?</p>
+        <div class="foot"><span>in progress</span></div>
+      </div>
+    </div>
+
+    <a class="node dest" href="https://transformer-circuits.pub/2026/workspace/index.html" target="_blank" rel="noopener">
+      <div class="marker">&#9873;</div>
+      <div class="card">
+        <p class="tag">the destination &mdash; the paper</p>
+        <h2>Verbalizable Representations Form a Global Workspace in Language Models</h2>
+        <p class="paper-authors">Gurnee, Sofroniew, Pearce, &hellip;, Batson, Lindsey (16 authors) &middot; Anthropic / Transformer Circuits &middot; July 2026</p>
+        <p style="margin-top:.8rem;">A new interpretability method (the Jacobian lens) surfaces a small, privileged set of &ldquo;word-like&rdquo; representations that the model can report on, steer, and reason with &mdash; structurally like the global workspace of consciousness theory. Once the trail is behind you, the paper reads like a home you already know.</p>
+        <div class="dest-links">
+          <a href="https://transformer-circuits.pub/2026/workspace/index.html" target="_blank" rel="noopener">read the paper &#8599;</a>
+          <a href="https://github.com/anthropics/jacobian-lens" target="_blank" rel="noopener">code (J-lens) &#8599;</a>
+        </div>
+      </div>
+    </a>
+
+  </main>
+
+  <section class="about">
+    <h3>What this is</h3>
+    <p>Each paper worth understanding has a few load-bearing ideas that, once you hold them, make the whole thing legible. <b>Paper Breadcrumbs</b> pulls those out into a short trail &mdash; one idea per step, built up from something you already know, and interactive so you can poke at it rather than just read.</p>
+    <p>This first trail walks from the plain calculus derivative to the interpretability instrument at the heart of Anthropic&rsquo;s 2026 global-workspace paper. More trails are coming, including material for fall coursework.</p>
+  </section>
+
+  <div class="footer">
+    <span>Paper Breadcrumbs &middot; made with care</span>
+    <span><a href="https://github.com/xiuyechen/paper-breadcrumbs" target="_blank" rel="noopener">source on GitHub &#8599;</a></span>
+  </div>
+
+</div>
+
+<script>
+  (function(){
+    var saved = null;
+    try { saved = localStorage.getItem('pb-theme'); } catch(e){}
+    if(saved){ document.documentElement.setAttribute('data-theme', saved); }
+  })();
+  function pbTheme(){
+    var el = document.documentElement;
+    var cur = el.getAttribute('data-theme');
+    if(!cur){ cur = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+    var next = cur === 'dark' ? 'light' : 'dark';
+    el.setAttribute('data-theme', next);
+    try { localStorage.setItem('pb-theme', next); } catch(e){}
+  }
+</script>
+</body>
+</html>

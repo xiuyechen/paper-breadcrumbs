@@ -1,0 +1,460 @@
+<title>Why &ldquo;transport a hidden activation into the final-layer basis via J&rdquo;</title>
+<style>
+  :root {
+    --paper: #f3f0e9;
+    --paper-panel: #ece7dc;
+    --ink: #1b2330;
+    --ink-soft: #46505f;
+    --ink-faint: #7c8492;
+    --rule: #d8d2c4;
+    --rule-strong: #c3bcac;
+    --in: #b3672c;      /* the activation / source */
+    --in-bg: #f2e2cf;
+    --out: #0c7d7d;     /* the readout / vocabulary */
+    --out-bg: #d5e8e6;
+    --accent: #0c7d7d;
+    --violet: #6a4fb0;  /* the transport step */
+    --shadow: rgba(27,35,48,.09);
+    --serif: "Palatino", "Palatino Linotype", "Book Antiqua", Charter, Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12151c; --paper-panel: #191d26; --ink: #e8e6df; --ink-soft: #b0b4bd;
+      --ink-faint: #79808c; --rule: #2a2f3a; --rule-strong: #3a404d;
+      --in: #e2965a; --in-bg: #33261a; --out: #4ec4c0; --out-bg: #16302f;
+      --accent: #4ec4c0; --violet: #a48cf0; --shadow: rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #f3f0e9; --paper-panel: #ece7dc; --ink: #1b2330; --ink-soft: #46505f;
+    --ink-faint: #7c8492; --rule: #d8d2c4; --rule-strong: #c3bcac;
+    --in: #b3672c; --in-bg: #f2e2cf; --out: #0c7d7d; --out-bg: #d5e8e6;
+    --accent: #0c7d7d; --violet: #6a4fb0; --shadow: rgba(27,35,48,.09);
+  }
+  :root[data-theme="dark"] {
+    --paper: #12151c; --paper-panel: #191d26; --ink: #e8e6df; --ink-soft: #b0b4bd;
+    --ink-faint: #79808c; --rule: #2a2f3a; --rule-strong: #3a404d;
+    --in: #e2965a; --in-bg: #33261a; --out: #4ec4c0; --out-bg: #16302f;
+    --accent: #4ec4c0; --violet: #a48cf0; --shadow: rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--sans); font-size: 18px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 4.5rem 1.5rem 6rem; }
+
+  .serieslink {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-faint);
+    margin: 0 0 1.5rem; display: flex; gap: .6rem; align-items: center;
+  }
+  .serieslink b { color: var(--accent); }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 1.1rem;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(2rem, 5.2vw, 2.9rem); line-height: 1.1;
+    letter-spacing: -.01em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst {
+    font-family: var(--serif); font-size: 1.28rem; line-height: 1.5;
+    color: var(--ink-soft); font-style: italic; margin: 0 0 2.2rem; max-width: 42ch;
+  }
+  .rule { height: 1px; background: var(--rule); border: 0; margin: 2.6rem 0; }
+
+  h2 {
+    font-family: var(--serif); font-weight: 600; font-size: 1.7rem;
+    line-height: 1.2; letter-spacing: -.01em; margin: 3.2rem 0 .3rem;
+    display: flex; align-items: baseline; gap: .7rem;
+  }
+  h2 .num {
+    font-family: var(--mono); font-size: .78rem; font-weight: 400; letter-spacing: .1em;
+    color: var(--accent); border: 1px solid var(--rule-strong); border-radius: 2px;
+    padding: .12em .5em; position: relative; top: -.2em; flex: none;
+  }
+  p { margin: 1.1rem 0; }
+  strong { font-weight: 640; }
+
+  .in-word  { color: var(--in);  font-weight: 640; }
+  .out-word { color: var(--out); font-weight: 640; }
+  .vio-word { color: var(--violet); font-weight: 640; }
+
+  .quote {
+    font-family: var(--serif); font-style: italic; font-size: 1.24rem; line-height: 1.45;
+    color: var(--ink); border-left: 3px solid var(--accent);
+    padding: .2rem 0 .2rem 1.3rem; margin: 1.8rem 0;
+  }
+
+  .panel {
+    background: var(--paper-panel); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 1.6rem 1.4rem; margin: 1.8rem 0; overflow-x: auto;
+  }
+  .panel .cap {
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ink-faint); margin: 0 0 1rem;
+  }
+  .formula {
+    font-family: var(--mono); font-size: 1.18rem; color: var(--ink);
+    text-align: center; line-height: 2.1;
+  }
+  .formula .big { font-size: 1.05em; }
+
+  var, .v {
+    font-family: var(--mono); font-style: normal; font-size: .92em;
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    padding: .05em .35em; border-radius: 3px;
+  }
+  .v.in  { background: color-mix(in srgb, var(--in) 16%, transparent); color: var(--in); }
+  .v.out { background: color-mix(in srgb, var(--out) 16%, transparent); color: var(--out); }
+  .v.vio { background: color-mix(in srgb, var(--violet) 16%, transparent); color: var(--violet); }
+
+  /* three-part glossary of the formula */
+  .parts { display: flex; flex-direction: column; gap: .7rem; margin: 1.6rem 0; }
+  .part {
+    display: grid; grid-template-columns: auto 1fr; gap: 0 1rem; align-items: start;
+    border: 1px solid var(--rule); border-radius: 8px; padding: 1rem 1.2rem;
+    background: var(--paper);
+  }
+  .part .sym {
+    font-family: var(--mono); font-size: 1.05rem; font-weight: 600;
+    padding: .3em .6em; border-radius: 5px; white-space: nowrap; text-align: center;
+    align-self: center;
+  }
+  .part.in  .sym { background: var(--in-bg);  color: var(--in);  }
+  .part.out .sym { background: var(--out-bg); color: var(--out); }
+  .part.vio .sym { background: color-mix(in srgb, var(--violet) 18%, transparent); color: var(--violet); }
+  .part .txt { font-size: .98rem; }
+  .part .txt b { display: block; margin-bottom: .1rem; font-size: 1rem; }
+
+  /* interactive stack diagram */
+  .demo {
+    background: var(--paper-panel); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 1.7rem 1.5rem 1.9rem; margin: 2rem 0;
+  }
+  .demo h3 { font-family: var(--serif); font-size: 1.15rem; margin: 0 0 .3rem; font-weight: 600; }
+  .demo .sub { color: var(--ink-soft); font-size: .95rem; margin: 0 0 1.3rem; }
+  .stage { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.3rem; align-items: center; }
+  @media (max-width: 560px){ .stage { grid-template-columns: 1fr; } }
+  canvas#stack { width: 100%; height: 300px; display: block; }
+  .readout-box {
+    border: 1px solid var(--rule); border-radius: 8px; background: var(--paper);
+    padding: 1rem 1.1rem;
+  }
+  .readout-box .rb-cap {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-faint); margin: 0 0 .8rem;
+  }
+  .tokrow {
+    display: flex; align-items: center; gap: .6rem; margin: .35rem 0;
+    font-family: var(--mono); font-size: .82rem;
+  }
+  .tokrow .tk { width: 5.5em; text-align: right; color: var(--ink); }
+  .tokrow .bar {
+    height: .8em; border-radius: 3px; background: var(--out);
+    transition: width .4s cubic-bezier(.2,.7,.3,1); min-width: 2px;
+  }
+  .tokrow .pct { color: var(--ink-faint); width: 3em; }
+  .layer-label {
+    text-align: center; font-family: var(--mono); font-size: .8rem;
+    color: var(--in); margin-top: .9rem; font-weight: 640;
+  }
+  .hint { text-align:center; font-family:var(--mono); font-size:.7rem; color:var(--ink-faint); margin-top:.3rem; letter-spacing:.04em;}
+
+  .check {
+    border: 1px solid var(--rule-strong); border-radius: 10px; padding: 1.4rem 1.5rem;
+    margin: 1.6rem 0; background: var(--paper);
+  }
+  .check .qlabel {
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 .5rem;
+  }
+  .check p.q { margin: 0 0 1rem; font-weight: 500; }
+  .check button {
+    font-family: var(--sans); font-size: .9rem; font-weight: 560; color: var(--paper);
+    background: var(--accent); border: 0; border-radius: 6px; padding: .55em 1.1em; cursor: pointer;
+    transition: transform .08s ease, filter .15s ease;
+  }
+  .check button:hover { filter: brightness(1.08); }
+  .check button:active { transform: translateY(1px); }
+  .check button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .answer {
+    margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px dashed var(--rule-strong);
+    color: var(--ink-soft); font-size: .97rem; display: none;
+  }
+  .answer.show { display: block; animation: fade .3s ease; }
+  .answer strong { color: var(--ink); }
+  @keyframes fade { from { opacity: 0; transform: translateY(-4px);} to {opacity:1; transform:none;} }
+
+  .aside {
+    border: 1px dashed var(--rule-strong); border-radius: 8px; padding: 1.1rem 1.3rem;
+    margin: 1.8rem 0; background: color-mix(in srgb, var(--violet) 6%, var(--paper));
+    font-size: .96rem;
+  }
+  .aside .t {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--violet); margin: 0 0 .5rem;
+  }
+
+  .footer {
+    margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule);
+    font-size: .9rem; color: var(--ink-faint);
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+
+<div class="wrap">
+
+  <p class="serieslink">Mini-lesson <b>02</b> &nbsp;/&nbsp; toward the global-workspace paper &nbsp;&middot;&nbsp; prev: what a Jacobian is</p>
+
+  <p class="eyebrow">From the math to the instrument</p>
+  <h1>Why &ldquo;transport a hidden activation into the final-layer basis via&nbsp;J&rdquo;</h1>
+  <p class="standfirst">The Jacobian was a matrix that turns input-nudges into output-nudges. Point it from the middle of a transformer to its exit, and it becomes a lens: a readout of what a hidden thought is <em>disposed to make the model say</em>.</p>
+
+  <hr class="rule">
+
+  <h2><span class="num">1</span> The thing we want to read</h2>
+  <p>A transformer processes text in a tall stack of layers. Running up the middle of that stack is the <strong>residual stream</strong> &mdash; a running vector, one per token position, that each layer reads from and writes back to. Call the vector at layer <var>&#8467;</var> the <span class="in-word">hidden activation</span> <span class="v in">h<sub>&#8467;</sub></span>.</p>
+
+  <p>That vector is the model&rsquo;s <em>state of mind</em> at that depth: everything it has figured out so far about the current token. The trouble is it&rsquo;s written in the model&rsquo;s own internal code &mdash; a list of a few thousand numbers with no labels. We can&rsquo;t read it directly.</p>
+
+  <p class="quote">We want to ask a hidden activation a single question: if the model had to speak <em>right now</em>, what words are you pushing it toward?</p>
+
+  <h2><span class="num">2</span> The model already has a translator &mdash; but only at the exit</h2>
+  <p>At the very top of the stack the model does something we <em>can</em> read: it takes the final activation <span class="v out">h<sub>final</sub></span> and multiplies it by the <strong>unembedding</strong> matrix, turning that internal vector into a score for every word in the vocabulary. High score &rarr; likely next token. That&rsquo;s the model&rsquo;s built-in translator from <span class="out-word">internal-vector language</span> into <span class="out-word">vocabulary</span>.</p>
+
+  <p>But the unembedding is <em>calibrated for the final layer only.</em> Feed it a mid-stack activation directly and you get garbage &mdash; it&rsquo;s the wrong dialect. A layer-6 vector doesn&rsquo;t live in the same basis as a layer-32 vector, even though both are &ldquo;the residual stream.&rdquo; So we need a step in between:</p>
+
+  <p class="quote"><span class="in-word">carry the mid-stack vector up</span> to where the translator works &mdash; into the <span class="out-word">final-layer basis</span> &mdash; <span class="vio-word">and the thing that carries it is a Jacobian.</span></p>
+
+  <h2><span class="num">3</span> The Jacobian <em>is</em> the transport</h2>
+  <p>Recall lesson 1: the Jacobian of a function is the matrix that best approximates it locally &mdash; <span class="in-word">nudge the input</span>, and <span class="v"><span class="out-word">&Delta;out</span> &asymp; J&thinsp;&middot;&thinsp;<span class="in-word">&Delta;in</span></span>. Now choose the function to be <em>&ldquo;the rest of the network&rdquo;</em>: the map from the activation at layer <var>&#8467;</var> all the way to the final activation.</p>
+
+  <div class="panel">
+    <p class="cap">The Jacobian of &ldquo;layer &#8467; &rarr; final layer&rdquo;</p>
+    <p class="formula">
+      <span class="big">J<sub>&#8467;</sub> &nbsp;=&nbsp; <span style="font-family:var(--serif); font-style:italic;">E</span>&nbsp;<span class="frac-wrap"><span style="display:inline-block; vertical-align:middle; text-align:center; font-size:.82em; line-height:1.1;"><span style="border-bottom:1.4px solid currentColor; padding:0 .3em .05em; display:block;">&part;<span class="out-word">h<sub>final</sub></span></span><span style="padding:.05em .3em 0; display:block;">&part;<span class="in-word">h<sub>&#8467;</sub></span></span></span></span></span>
+    </p>
+  </div>
+
+  <p>Read it exactly as a Jacobian: <strong>how does the <span class="out-word">final activation</span> move when you nudge the <span class="in-word">layer-&#8467; activation</span>?</strong> That matrix is precisely the linear map that carries a layer-&#8467; vector into the final-layer basis. The <span class="serif" style="font-style:italic;">E</span> (an average over many prompts) we&rsquo;ll unpack in a moment &mdash; it&rsquo;s what turns a fragile per-input derivative into a stable, reusable lens.</p>
+
+  <h2><span class="num">4</span> Stack the two steps &mdash; that&rsquo;s the lens</h2>
+  <p>Two moves, in order: <span class="vio-word">transport</span> the activation up with <span class="v vio">J<sub>&#8467;</sub></span>, then <span class="out-word">translate</span> it to words with the model&rsquo;s own <span class="v out">unembed</span>. Compose them and you have the whole instrument:</p>
+
+  <div class="panel">
+    <p class="cap">The Jacobian lens</p>
+    <p class="formula">
+      <span class="v out" style="font-size:1.1em;">lens<sub>&#8467;</sub>(<span class="in-word" style="background:none; color:var(--in);">h</span>)</span>
+      &nbsp;=&nbsp;
+      <span class="v out" style="font-size:1.05em;">unembed</span><span style="font-size:1.2em;">(</span><span class="v vio" style="font-size:1.05em;">J<sub>&#8467;</sub></span> &middot; <span class="v in" style="font-size:1.05em;">h</span><span style="font-size:1.2em;">)</span>
+    </p>
+  </div>
+
+  <div class="parts">
+    <div class="part in">
+      <span class="sym">h</span>
+      <span class="txt"><b>the hidden activation</b>The vector you&rsquo;re curious about, sitting at layer &#8467;. The model&rsquo;s state of mind mid-thought.</span>
+    </div>
+    <div class="part vio">
+      <span class="sym">J<sub>&#8467;</sub> &middot; h</span>
+      <span class="txt"><b>transport</b>The Jacobian carries <span class="in-word">h</span> from layer &#8467; up into the final-layer basis &mdash; where the translator is calibrated to work.</span>
+    </div>
+    <div class="part out">
+      <span class="sym">unembed(&hellip;)</span>
+      <span class="txt"><b>translate to words</b>The model&rsquo;s own output map turns the transported vector into a ranked list over the vocabulary &mdash; the words <span class="in-word">h</span> is disposed to make the model say.</span>
+    </div>
+  </div>
+
+  <p>So the output of <span class="v out">lens<sub>&#8467;</sub>(h)</span> is not a prediction and not an echo of the input &mdash; it&rsquo;s a <strong>ranked list of words</strong> naming what that buried activation is <em>leaning toward.</em> Point the lens at different depths and you watch a thought resolve into language.</p>
+
+  <div class="demo">
+    <h3>Watch a thought resolve into words</h3>
+    <p class="sub">Prompt: <span class="v">&ldquo;The currency used in the country shaped like a boot is&rdquo;</span>. Click a layer to move the lens down the stack and read what the activation there is disposed to say.</p>
+    <div class="stage">
+      <div>
+        <canvas id="stack" width="380" height="300"></canvas>
+        <div class="layer-label" id="llabel">layer 28 &mdash; near the exit</div>
+        <div class="hint">click any layer &bull;</div>
+      </div>
+      <div class="readout-box">
+        <p class="rb-cap">lens&#8467;(h) &mdash; top tokens</p>
+        <div id="toks"></div>
+      </div>
+    </div>
+  </div>
+
+  <h2><span class="num">5</span> Why the average (that&nbsp;<span class="serif" style="font-style:italic;">E</span>)</h2>
+  <p>A Jacobian is a <em>local</em> approximation &mdash; strictly, it&rsquo;s different for every input. If we recomputed it fresh for each prompt, the &ldquo;lens&rdquo; would wobble with every sentence and tell us nothing general. The fix is the expectation <span class="serif" style="font-style:italic;">E</span>: average the Jacobian over hundreds of prompts and positions in ordinary text.</p>
+
+  <div class="aside">
+    <p class="t">the move that makes it a lens, not a derivative</p>
+    <p style="margin:0;">Averaging turns a per-sentence tangent into <strong>one fixed matrix</strong> for layer &#8467; &mdash; a stable, reusable instrument you fit once and then aim at any activation. That&rsquo;s the difference between &ldquo;the derivative here, right now&rdquo; and &ldquo;a lens you can pick up and look through.&rdquo;</p>
+  </div>
+
+  <hr class="rule">
+
+  <h2>Quick checks</h2>
+  <p style="color:var(--ink-soft); margin-top:.4rem;">Two questions to lock in the shape of the idea.</p>
+
+  <div class="check">
+    <p class="qlabel">Check 1 &mdash; why not use unembed directly</p>
+    <p class="q">Why can&rsquo;t we just feed a mid-stack activation <span class="v in">h<sub>&#8467;</sub></span> straight into <span class="v out">unembed</span> and skip the Jacobian?</p>
+    <button onclick="reveal('a1')">Reveal answer</button>
+    <div class="answer" id="a1">
+      <p>Because <span class="out-word">unembed</span> is calibrated for the <strong>final-layer basis only</strong>. A layer-&#8467; vector is written in a different internal dialect, so decoding it directly gives noise. The Jacobian <span class="v vio">J<sub>&#8467;</sub></span> is exactly the linear map that <strong>transports</strong> the vector into the basis where the translator works. Transport first, then translate.</p>
+    </div>
+  </div>
+
+  <div class="check">
+    <p class="qlabel">Check 2 &mdash; what the readout means</p>
+    <p class="q">The lens outputs a ranked list of vocabulary tokens. Is that the model&rsquo;s <em>next-token prediction</em>? If not, what is it?</p>
+    <button onclick="reveal('a2')">Reveal answer</button>
+    <div class="answer" id="a2">
+      <p>No. It&rsquo;s <strong>what that particular activation is disposed to make the model say</strong> &mdash; the words <em>this internal vector</em> is leaning toward, read out in isolation. The true next-token prediction only emerges at the final layer after every activation combines. Aim the lens mid-stack and you catch a concept mid-formation, before it&rsquo;s the answer. That&rsquo;s the whole point: it exposes the internal &ldquo;words&rdquo; the model reasons with &mdash; the raw material of the <span class="in-word">global workspace</span>.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Next in the series: the four functional tests &mdash; verbal report, directed modulation, internal reasoning, flexible generalization &mdash; that turn &ldquo;the lens finds verbalizable representations&rdquo; into &ldquo;these representations form a <b>global workspace</b>.&rdquo; And then: could a <b>beauty axis</b> live in that workspace?</p>
+  </div>
+
+</div>
+
+<script>
+  function reveal(id){ document.getElementById(id).classList.add('show'); }
+
+  (function(){
+    var cv = document.getElementById('stack');
+    if(!cv) return;
+    var ctx = cv.getContext('2d');
+    var DPR = Math.min(window.devicePixelRatio||1, 2);
+
+    // synthetic "lens readout" per layer: a thought resolving from vague -> "lira"/"euro"
+    // country shaped like a boot = Italy; historical lira -> euro.
+    var LAYERS = [
+      {L:6,  name:"early &mdash; still lexical",   toks:[["boot",30],["shape",22],["country",18],["Italy",14],["shoe",9]]},
+      {L:14, name:"mid &mdash; concept forming",   toks:[["Italy",44],["Rome",20],["Europe",14],["country",12],["map",7]]},
+      {L:20, name:"mid-late &mdash; homing in",    toks:[["Italy",40],["euro",26],["lira",18],["Europe",9],["money",5]]},
+      {L:28, name:"near the exit",                 toks:[["euro",52],["lira",30],["Euro",9],["dollar",5],["franc",3]]}
+    ];
+    var sel = 3;
+
+    function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+    function drawStack(){
+      var w = cv.clientWidth, h = cv.clientHeight;
+      cv.width = w*DPR; cv.height = h*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+      ctx.clearRect(0,0,w,h);
+      var ink=css('--ink'), soft=css('--ink-faint'), rule=css('--rule');
+      var IN=css('--in'), OUT=css('--out'), VIO=css('--violet'), panel=css('--paper');
+
+      var n = LAYERS.length;
+      var boxW = w*0.42, boxH = 34, gap = 20;
+      var totalH = n*boxH + (n-1)*gap;
+      var top = (h-totalH)/2;
+      var cx = w*0.30;
+      var railX = cx - boxW/2 - 12;   // spine runs just left of the boxes
+
+      // draw residual stream spine
+      ctx.strokeStyle = rule; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(railX, top-14); ctx.lineTo(railX, top+totalH+14); ctx.stroke();
+
+      // final-layer translator box on the right
+      var transX = w*0.72, transW = w*0.26;
+      var transY = top - 4, transH = 40;
+      ctx.fillStyle = css('--out-bg'); ctx.strokeStyle = OUT; ctx.lineWidth=1.5;
+      roundRect(transX, transY, transW, transH, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = OUT; ctx.font = "600 11px " + css('--mono') + ", monospace"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText("unembed", transX+transW/2, transY+transH/2);
+
+      cv.__hit = [];
+      // layers top(exit) -> bottom(early); LAYERS[3] is exit so reverse
+      for(var i=0;i<n;i++){
+        var layer = LAYERS[n-1-i]; // i=0 -> exit at top
+        var y = top + i*(boxH+gap);
+        var x = cx - boxW/2;
+        var isSel = (n-1-i)===sel;
+        ctx.fillStyle = isSel ? css('--in-bg') : panel;
+        ctx.strokeStyle = isSel ? IN : rule;
+        ctx.lineWidth = isSel ? 2 : 1.2;
+        roundRect(x, y, boxW, boxH, 6); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = isSel ? IN : soft;
+        ctx.font = (isSel?"600 ":"400 ")+"12px "+css('--mono')+", monospace";
+        ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText("h  layer "+layer.L, cx, y+boxH/2);
+        // node dot on the rail (left of the boxes), plus a short connector
+        ctx.strokeStyle = isSel ? IN : rule; ctx.lineWidth = isSel ? 2 : 1.2;
+        ctx.beginPath(); ctx.moveTo(railX, y+boxH/2); ctx.lineTo(x, y+boxH/2); ctx.stroke();
+        ctx.fillStyle = isSel ? IN : soft;
+        ctx.beginPath(); ctx.arc(railX, y+boxH/2, isSel?5:3, 0, 7); ctx.fill();
+
+        cv.__hit.push({idx:n-1-i, x:x, y:y, w:boxW, h:boxH});
+      }
+
+      // transport arrow from selected layer -> translator (violet)
+      var selPos=null;
+      for(var k=0;k<cv.__hit.length;k++) if(cv.__hit[k].idx===sel) selPos=cv.__hit[k];
+      if(selPos){
+        var sy = selPos.y + selPos.h/2;
+        var sx = selPos.x + selPos.w;
+        var ty = transY + transH/2;
+        ctx.strokeStyle = VIO; ctx.lineWidth = 2.4; ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        var midX = (sx+transX)/2;
+        ctx.bezierCurveTo(midX, sy, midX, ty, transX, ty);
+        ctx.stroke();
+        // arrowhead
+        ctx.fillStyle = VIO;
+        ctx.beginPath(); ctx.moveTo(transX, ty); ctx.lineTo(transX-8, ty-4); ctx.lineTo(transX-8, ty+4); ctx.closePath(); ctx.fill();
+        // label
+        ctx.fillStyle = VIO; ctx.font="italic 11px "+css('--serif')+", serif"; ctx.textAlign="center";
+        ctx.fillText("J", midX, (sy+ty)/2 - 8);
+      }
+    }
+
+    function roundRect(x,y,w,h,r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+      ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+    }
+
+    function drawToks(){
+      var layer = LAYERS[sel];
+      var box = document.getElementById('toks');
+      var max = Math.max.apply(null, layer.toks.map(function(t){return t[1];}));
+      box.innerHTML = layer.toks.map(function(t){
+        var wpct = Math.round(t[1]/max*100);
+        return '<div class="tokrow"><span class="tk">'+t[0]+'</span>'+
+               '<span class="bar" style="width:'+wpct+'%"></span>'+
+               '<span class="pct">'+t[1]+'%</span></div>';
+      }).join('');
+      document.getElementById('llabel').innerHTML = 'layer '+layer.L+' &mdash; '+layer.name;
+    }
+
+    cv.addEventListener('click', function(e){
+      var r = cv.getBoundingClientRect();
+      var mx = e.clientX - r.left, my = e.clientY - r.top;
+      if(!cv.__hit) return;
+      for(var i=0;i<cv.__hit.length;i++){
+        var b = cv.__hit[i];
+        if(mx>=b.x && mx<=b.x+b.w && my>=b.y && my<=b.y+b.h){ sel=b.idx; drawStack(); drawToks(); break; }
+      }
+    });
+    cv.style.cursor = 'pointer';
+
+    window.addEventListener('resize', function(){ drawStack(); });
+    new MutationObserver(function(){ drawStack(); }).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+    if(window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){drawStack();});
+
+    drawStack(); drawToks();
+  })();
+</script>
