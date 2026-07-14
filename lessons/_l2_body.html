@@ -289,7 +289,7 @@
     <div class="stage">
       <div>
         <canvas id="stack" width="380" height="300"></canvas>
-        <div class="layer-label" id="llabel">layer 28 &mdash; near the exit</div>
+        <div class="layer-label" id="llabel">layer 30 &mdash; near the exit</div>
         <div class="hint">click any layer &bull;</div>
       </div>
       <div class="readout-box">
@@ -297,7 +297,7 @@
         <div id="toks"></div>
       </div>
     </div>
-    <p class="demo-note"><strong>Illustrative.</strong> These token percentages are a hand-set teaching mockup of a thought resolving into words &mdash; the mechanism and formula are faithful, but the numbers are not real model output. Running the actual <a href="https://github.com/anthropics/jacobian-lens" target="_blank" rel="noopener">J-lens code</a> on this prompt would replace them with genuine readouts.</p>
+    <p class="demo-note"><strong>Real output.</strong> These are genuine Jacobian-lens readouts &mdash; the pre-fitted <a href="https://github.com/anthropics/jacobian-lens" target="_blank" rel="noopener">neuronpedia lens</a> (<span class="v">qwen-n1000</span>) run on <span class="v">Qwen3.5-4B</span> for this exact prompt, read at the final position, top tokens by probability. Early layers show only formatting noise; by layer&nbsp;24 the <span class="out-word">currency</span> category has formed; by layer&nbsp;30 it resolves to <span class="out-word">&ldquo;Euro&rdquo;</span> &mdash; the model&rsquo;s thought climbing into words. (Raw JSON in the <a href="https://github.com/xiuyechen/paper-breadcrumbs/blob/main/tools/results.json" target="_blank" rel="noopener">repo</a>.)</p>
   </div>
 
   <h2><span class="num">5</span> Why the average (that&nbsp;<span class="serif" style="font-style:italic;">E</span>)</h2>
@@ -346,13 +346,14 @@
     var ctx = cv.getContext('2d');
     var DPR = Math.min(window.devicePixelRatio||1, 2);
 
-    // synthetic "lens readout" per layer: a thought resolving from vague -> "lira"/"euro"
-    // country shaped like a boot = Italy; historical lira -> euro.
+    // REAL Jacobian-lens output — neuronpedia/jacobian-lens@qwen-n1000 on Qwen3.5-4B,
+    // read at the final position ("is"), top tokens by softmax %. Watch the thought
+    // climb from formatting-noise -> the CURRENCY category -> "Euro". See tools/results.json.
     var LAYERS = [
-      {L:6,  name:"early &mdash; still lexical",   toks:[["boot",30],["shape",22],["country",18],["Italy",14],["shoe",9]]},
-      {L:14, name:"mid &mdash; concept forming",   toks:[["Italy",44],["Rome",20],["Europe",14],["country",12],["map",7]]},
-      {L:20, name:"mid-late &mdash; homing in",    toks:[["Italy",40],["euro",26],["lira",18],["Europe",9],["money",5]]},
-      {L:28, name:"near the exit",                 toks:[["euro",52],["lira",30],["Euro",9],["dollar",5],["franc",3]]}
+      {L:8,  name:"early &mdash; still formatting", toks:[["…",63.5],["…",14.2],["(blank)",9.7],["[…]",4.3],["\\",1.6]]},
+      {L:16, name:"mid &mdash; not yet conceptual", toks:[["\\n",42.3],[".\\",20.0],["____",15.6],["\\\"",5.1],["?\\",2.1]]},
+      {L:24, name:"mid-late &mdash; currency forms",toks:[["currency",48.1],["dollars",12.2],["euros",10.7],["Dollars",5.7],["Dollar",3.9]]},
+      {L:30, name:"near the exit &mdash; &ldquo;Euro&rdquo;",toks:[["Euro",38.5],["the",18.2],["Euros",16.0],["euros",8.6],["euro",4.3]]}
     ];
     var sel = 3;
 

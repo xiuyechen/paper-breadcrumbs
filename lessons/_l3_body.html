@@ -1,0 +1,372 @@
+<title>The four tests that make it a &ldquo;workspace&rdquo;</title>
+<style>
+  :root {
+    --paper: #f3f0e9;
+    --paper-panel: #ece7dc;
+    --ink: #1b2330;
+    --ink-soft: #46505f;
+    --ink-faint: #7c8492;
+    --rule: #d8d2c4;
+    --rule-strong: #c3bcac;
+    --in: #b3672c;      /* the representation / activation */
+    --in-bg: #f2e2cf;
+    --out: #0c7d7d;     /* the readout / behavior */
+    --out-bg: #d5e8e6;
+    --accent: #0c7d7d;
+    --violet: #6a4fb0;  /* the causal / workspace step */
+    --violet-bg: #e7e0f4;
+    --shadow: rgba(27,35,48,.09);
+    --serif: "Palatino", "Palatino Linotype", "Book Antiqua", Charter, Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12151c; --paper-panel: #191d26; --ink: #e8e6df; --ink-soft: #b0b4bd;
+      --ink-faint: #79808c; --rule: #2a2f3a; --rule-strong: #3a404d;
+      --in: #e2965a; --in-bg: #33261a; --out: #4ec4c0; --out-bg: #16302f;
+      --accent: #4ec4c0; --violet: #a48cf0; --violet-bg: #241d38; --shadow: rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #f3f0e9; --paper-panel: #ece7dc; --ink: #1b2330; --ink-soft: #46505f;
+    --ink-faint: #7c8492; --rule: #d8d2c4; --rule-strong: #c3bcac;
+    --in: #b3672c; --in-bg: #f2e2cf; --out: #0c7d7d; --out-bg: #d5e8e6;
+    --accent: #0c7d7d; --violet: #6a4fb0; --violet-bg: #e7e0f4; --shadow: rgba(27,35,48,.09);
+  }
+  :root[data-theme="dark"] {
+    --paper: #12151c; --paper-panel: #191d26; --ink: #e8e6df; --ink-soft: #b0b4bd;
+    --ink-faint: #79808c; --rule: #2a2f3a; --rule-strong: #3a404d;
+    --in: #e2965a; --in-bg: #33261a; --out: #4ec4c0; --out-bg: #16302f;
+    --accent: #4ec4c0; --violet: #a48cf0; --violet-bg: #241d38; --shadow: rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--sans); font-size: 18px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 4.5rem 1.5rem 6rem; }
+
+  .serieslink {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-faint);
+    margin: 0 0 1.5rem; display: flex; gap: .6rem; align-items: center; flex-wrap: wrap;
+  }
+  .serieslink b { color: var(--accent); }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 1.1rem;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(2rem, 5.2vw, 2.9rem); line-height: 1.1;
+    letter-spacing: -.01em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst {
+    font-family: var(--serif); font-size: 1.28rem; line-height: 1.5;
+    color: var(--ink-soft); font-style: italic; margin: 0 0 2.2rem; max-width: 44ch;
+  }
+  .rule { height: 1px; background: var(--rule); border: 0; margin: 2.6rem 0; }
+
+  h2 {
+    font-family: var(--serif); font-weight: 600; font-size: 1.7rem;
+    line-height: 1.2; letter-spacing: -.01em; margin: 3.2rem 0 .3rem;
+    display: flex; align-items: baseline; gap: .7rem;
+  }
+  h2 .num {
+    font-family: var(--mono); font-size: .78rem; font-weight: 400; letter-spacing: .1em;
+    color: var(--accent); border: 1px solid var(--rule-strong); border-radius: 2px;
+    padding: .12em .5em; position: relative; top: -.2em; flex: none;
+  }
+  p { margin: 1.1rem 0; }
+  strong { font-weight: 640; }
+
+  .in-word  { color: var(--in);  font-weight: 640; }
+  .out-word { color: var(--out); font-weight: 640; }
+  .vio-word { color: var(--violet); font-weight: 640; }
+
+  .quote {
+    font-family: var(--serif); font-style: italic; font-size: 1.24rem; line-height: 1.45;
+    color: var(--ink); border-left: 3px solid var(--accent);
+    padding: .2rem 0 .2rem 1.3rem; margin: 1.8rem 0;
+  }
+
+  var, .v {
+    font-family: var(--mono); font-style: normal; font-size: .92em;
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    padding: .05em .35em; border-radius: 3px;
+  }
+  .v.in  { background: color-mix(in srgb, var(--in) 16%, transparent); color: var(--in); }
+  .v.out { background: color-mix(in srgb, var(--out) 16%, transparent); color: var(--out); }
+  .v.vio { background: color-mix(in srgb, var(--violet) 16%, transparent); color: var(--violet); }
+
+  .aside {
+    border: 1px dashed var(--rule-strong); border-radius: 8px; padding: 1.1rem 1.3rem;
+    margin: 1.8rem 0; background: color-mix(in srgb, var(--violet) 6%, var(--paper));
+    font-size: .96rem;
+  }
+  .aside .t {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--violet); margin: 0 0 .5rem;
+  }
+
+  /* the interactive four-tests panel */
+  .tests {
+    background: var(--paper-panel); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 1.7rem 1.5rem 1.9rem; margin: 2.2rem 0;
+  }
+  .tests h3 { font-family: var(--serif); font-size: 1.15rem; margin: 0 0 .3rem; font-weight: 600; }
+  .tests .sub { color: var(--ink-soft); font-size: .95rem; margin: 0 0 1.3rem; }
+  .test-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .7rem; }
+  @media (max-width: 560px){ .test-grid { grid-template-columns: 1fr; } }
+  .test-tab {
+    text-align: left; cursor: pointer; font-family: var(--sans);
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 8px;
+    padding: .85rem 1rem; transition: border-color .15s, transform .08s, box-shadow .15s;
+    display: flex; flex-direction: column; gap: .25rem;
+  }
+  .test-tab:hover { border-color: var(--rule-strong); transform: translateY(-2px); box-shadow: 0 8px 20px -12px var(--shadow); }
+  .test-tab .tnum {
+    font-family: var(--mono); font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
+  }
+  .test-tab .tname { font-weight: 600; font-size: 1.02rem; line-height: 1.2; }
+  .test-tab[aria-selected="true"] {
+    border-color: var(--violet); background: var(--violet-bg);
+  }
+  .test-tab[aria-selected="true"] .tnum { color: var(--violet); }
+  .test-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .test-detail {
+    margin-top: 1.2rem; border: 1px solid var(--rule); border-left: 3px solid var(--violet);
+    border-radius: 8px; padding: 1.2rem 1.3rem; background: var(--paper);
+  }
+  .test-detail .askswhat {
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-faint); margin: 0 0 .4rem;
+  }
+  .test-detail .claim { font-size: 1.06rem; margin: 0 0 .8rem; font-weight: 560; }
+  .test-detail .how { color: var(--ink-soft); font-size: .96rem; margin: 0 0 .8rem; }
+  .test-detail .verdict {
+    font-family: var(--mono); font-size: .8rem; color: var(--out);
+    display: flex; align-items: baseline; gap: .5rem;
+  }
+  .test-detail .verdict b { color: var(--out); }
+
+  .ladder { display: flex; flex-direction: column; gap: 0; margin: 1.8rem 0; }
+  .rung {
+    display: grid; grid-template-columns: auto 1fr; gap: 0 1rem; align-items: start;
+    padding: .9rem 0; border-top: 1px solid var(--rule);
+  }
+  .rung:last-child { border-bottom: 1px solid var(--rule); }
+  .rung .step {
+    font-family: var(--mono); font-size: .7rem; color: var(--violet); font-weight: 600;
+    white-space: nowrap; padding-top: .15rem;
+  }
+  .rung .txt { font-size: .98rem; }
+  .rung .txt b { color: var(--ink); }
+
+  .check {
+    border: 1px solid var(--rule-strong); border-radius: 10px; padding: 1.4rem 1.5rem;
+    margin: 1.6rem 0; background: var(--paper);
+  }
+  .check .qlabel {
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 .5rem;
+  }
+  .check p.q { margin: 0 0 1rem; font-weight: 500; }
+  .check button {
+    font-family: var(--sans); font-size: .9rem; font-weight: 560; color: var(--paper);
+    background: var(--accent); border: 0; border-radius: 6px; padding: .55em 1.1em; cursor: pointer;
+    transition: transform .08s ease, filter .15s ease;
+  }
+  .check button:hover { filter: brightness(1.08); }
+  .check button:active { transform: translateY(1px); }
+  .check button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .answer {
+    margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px dashed var(--rule-strong);
+    color: var(--ink-soft); font-size: .97rem; display: none;
+  }
+  .answer.show { display: block; animation: fade .3s ease; }
+  .answer strong { color: var(--ink); }
+  @keyframes fade { from { opacity: 0; transform: translateY(-4px);} to {opacity:1; transform:none;} }
+
+  .arrival {
+    border: 1px solid var(--out); border-radius: 10px; padding: 1.4rem 1.5rem;
+    margin: 2rem 0; background: color-mix(in srgb, var(--out) 7%, var(--paper));
+  }
+  .arrival .t {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--out); margin: 0 0 .5rem;
+  }
+  .arrival a { color: var(--out); font-weight: 600; }
+
+  .footer {
+    margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule);
+    font-size: .9rem; color: var(--ink-faint);
+  }
+  .footer a { color: var(--ink-soft); }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+
+<div class="wrap">
+
+  <p class="serieslink">Mini-lesson <b>03</b> &nbsp;/&nbsp; toward the global-workspace paper &nbsp;&middot;&nbsp; prev: what the lens reads</p>
+
+  <p class="eyebrow">From an instrument to a claim</p>
+  <h1>The four tests that make it a &ldquo;workspace&rdquo;</h1>
+  <p class="standfirst">Lesson&nbsp;2 gave us a lens that turns a hidden activation into words. Finding word-like readouts is suggestive &mdash; but a picture is not a mechanism. Four functional tests are what promote &ldquo;the lens finds verbalizable representations&rdquo; into &ldquo;these representations form a <em>global workspace</em>.&rdquo;</p>
+
+  <hr class="rule">
+
+  <h2><span class="num">1</span> Why finding words isn&rsquo;t enough</h2>
+  <p>The Jacobian lens shows that certain mid-stack activations decode into clean, nameable tokens &mdash; <span class="in-word">Italy</span>, <span class="in-word">euro</span>, a concept mid-formation. Tempting to stop there and declare the model &ldquo;thinks in words.&rdquo; But a decoder can find structure that the model itself never <em>uses</em>. The readout might be an artifact of the lens, not a load-bearing part of the computation.</p>
+
+  <p class="quote">The question is not &ldquo;can we <em>read</em> a word off this activation?&rdquo; but &ldquo;does the model <em>act</em> on that word &mdash; report it, be steered by it, reason over it, generalize it?&rdquo;</p>
+
+  <p>That distinction &mdash; between a representation you can <span class="out-word">observe</span> and one the system actually <span class="vio-word">functions with</span> &mdash; is exactly the line that <strong>global workspace theory</strong> draws in cognitive science. A global workspace isn&rsquo;t just information that&rsquo;s present; it&rsquo;s information that&rsquo;s <em>broadcast</em> &mdash; available to be reported, to drive downstream processes, and to be recombined. The paper&rsquo;s move is to take those functional criteria and test the lens&rsquo;s representations against them, one by one.</p>
+
+  <h2><span class="num">2</span> The four tests</h2>
+  <p>Each test asks whether a lens-readable representation has one of the properties a workspace item should have. Click through them &mdash; they climb from &ldquo;the model can <em>say</em> it&rdquo; to &ldquo;the model can <em>reason with</em> it in situations it never saw.&rdquo;</p>
+
+  <div class="tests">
+    <h3>The functional criteria</h3>
+    <p class="sub">A representation earns &ldquo;workspace&rdquo; status only if it passes as a thing the model uses &mdash; not just a thing we can see.</p>
+    <div class="test-grid" role="tablist" aria-label="The four tests">
+      <button class="test-tab" role="tab" aria-selected="true" data-i="0" onclick="selTest(0)">
+        <span class="tnum">Test 1</span>
+        <span class="tname">Verbal report</span>
+      </button>
+      <button class="test-tab" role="tab" aria-selected="false" data-i="1" onclick="selTest(1)">
+        <span class="tnum">Test 2</span>
+        <span class="tname">Directed modulation</span>
+      </button>
+      <button class="test-tab" role="tab" aria-selected="false" data-i="2" onclick="selTest(2)">
+        <span class="tnum">Test 3</span>
+        <span class="tname">Internal reasoning</span>
+      </button>
+      <button class="test-tab" role="tab" aria-selected="false" data-i="3" onclick="selTest(3)">
+        <span class="tnum">Test 4</span>
+        <span class="tname">Flexible generalization</span>
+      </button>
+    </div>
+    <div class="test-detail" id="tdetail" aria-live="polite"></div>
+  </div>
+
+  <h2><span class="num">3</span> Why the <em>order</em> matters</h2>
+  <p>The tests aren&rsquo;t a checklist you tick in any sequence &mdash; they&rsquo;re a ladder of increasing evidential weight. Each rung rules out a cheaper explanation the rung below it can&rsquo;t.</p>
+
+  <div class="ladder">
+    <div class="rung">
+      <span class="step">report &rarr;</span>
+      <span class="txt"><b>rules out: it&rsquo;s only in the decoder.</b> If the model can <em>say</em> the representation on demand, the information is at least available to its output pathway &mdash; not merely visible to our lens.</span>
+    </div>
+    <div class="rung">
+      <span class="step">modulate &rarr;</span>
+      <span class="txt"><b>rules out: it&rsquo;s a passive correlate.</b> If pushing on the representation <em>changes behavior</em> in the predicted direction, it&rsquo;s causal, not a bystander that happens to correlate with the answer.</span>
+    </div>
+    <div class="rung">
+      <span class="step">reason &rarr;</span>
+      <span class="txt"><b>rules out: it&rsquo;s a single-step lookup.</b> If the model chains the representation through intermediate steps, it&rsquo;s being used as working material, not just retrieved and emitted.</span>
+    </div>
+    <div class="rung">
+      <span class="step">generalize</span>
+      <span class="txt"><b>rules out: it&rsquo;s memorized for these prompts.</b> If the same representation does its job in contexts the model never trained on, it&rsquo;s a reusable, broadcastable item &mdash; the defining property of a workspace.</span>
+    </div>
+  </div>
+
+  <div class="aside">
+    <p class="t">the shape of the argument</p>
+    <p style="margin:0;">Notice this is the same escalation a skeptic would demand of <em>any</em> claim that an internal variable is &ldquo;real&rdquo;: show me you can read it, then that it does something, then that it composes, then that it transfers. Pass all four and &ldquo;the model represents X&rdquo; stops being a figure of speech.</p>
+  </div>
+
+  <h2><span class="num">4</span> What passing all four buys you</h2>
+  <p>Clear the four tests and the lens&rsquo;s readouts are no longer just <span class="out-word">visualizations</span>. They&rsquo;re <span class="vio-word">functional units</span> the model reports on, is steered by, reasons over, and reuses &mdash; which is precisely the operational definition of a <strong>global workspace</strong> borrowed from consciousness research. The claim in the paper&rsquo;s title, <em>&ldquo;verbalizable representations form a global workspace in language models,&rdquo;</em> is exactly this bundle of four passes, not a metaphor.</p>
+
+  <p>And this is where the trail opens onto live research. If the workspace holds word-like items the model can report, steer, and recombine, then the natural next question is <em>which</em> items live there. Concrete ones &mdash; <span class="in-word">Italy</span>, <span class="in-word">euro</span> &mdash; are the easy case. But could a more abstract axis, something like <span class="vio-word">beauty</span>, satisfy the same four tests? That would make an aesthetic judgment not a vague vibe but a reportable, steerable, reusable workspace variable &mdash; and the four tests are exactly the protocol you&rsquo;d run to find out.</p>
+
+  <hr class="rule">
+
+  <h2>Quick checks</h2>
+  <p style="color:var(--ink-soft); margin-top:.4rem;">Two questions to lock in why four tests, and in this order.</p>
+
+  <div class="check">
+    <p class="qlabel">Check 1 &mdash; report vs. modulation</p>
+    <p class="q">The model can produce the word &ldquo;euro&rdquo; when asked about Italy&rsquo;s currency (passes <em>verbal report</em>). Why isn&rsquo;t that alone enough to call the representation causal?</p>
+    <button onclick="reveal('a1')">Reveal answer</button>
+    <div class="answer" id="a1">
+      <p>Because <strong>report shows availability, not influence.</strong> The model could be reading the answer off some other pathway while the lens-readable representation just rides along as a correlate. Only <strong>directed modulation</strong> &mdash; intervening on that representation and watching the output move in the predicted direction &mdash; shows it&rsquo;s actually doing causal work. Correlation passes test&nbsp;1; causation is what test&nbsp;2 demands.</p>
+    </div>
+  </div>
+
+  <div class="check">
+    <p class="qlabel">Check 2 &mdash; the load-bearing rung</p>
+    <p class="q">Of the four, which test most directly earns the word &ldquo;workspace&rdquo; &mdash; and why?</p>
+    <button onclick="reveal('a2')">Reveal answer</button>
+    <div class="answer" id="a2">
+      <p><strong>Flexible generalization.</strong> A workspace item&rsquo;s defining property is that it&rsquo;s <em>broadcast and reusable</em> &mdash; available to processes and contexts beyond the one that produced it. Report, modulation, and reasoning can all, in principle, be true of a narrow representation memorized for specific prompts. Only transfer to <strong>unseen contexts</strong> shows the representation is a general-purpose unit the rest of the model can pick up and use &mdash; which is what &ldquo;global&rdquo; means. (The other three rule out cheaper stories; this one delivers the actual claim.)</p>
+    </div>
+  </div>
+
+  <div class="arrival">
+    <p class="t">end of the trail</p>
+    <p style="margin:0;">You now hold the paper&rsquo;s whole spine: a Jacobian (lesson&nbsp;1) becomes a lens (lesson&nbsp;2), and four functional tests (this lesson) promote its readouts into a global workspace. <a href="https://transformer-circuits.pub/2026/workspace/index.html" target="_blank" rel="noopener">Read the paper &#8599;</a> &mdash; it should read like a home you already know.</p>
+  </div>
+
+  <div class="footer">
+    <p>Trail 01 complete. Return to <a href="../index.html">the path</a> to see the whole route, or step straight into the paper.</p>
+  </div>
+
+</div>
+
+<script>
+  var TESTS = [
+    {
+      name: "Verbal report",
+      asks: "Can the model say it?",
+      claim: "The model can be prompted to name the representation on demand.",
+      how: "Ask directly (“what currency…?”) and check that the lens-readable concept shows up in the actual output, not just in the decoder. Establishes the information is available to the output pathway.",
+      verdict: "rules out — “it only exists in our lens”"
+    },
+    {
+      name: "Directed modulation",
+      asks: "Does pushing on it change behavior?",
+      claim: "Intervening on the representation steers the output in the predicted direction.",
+      how: "Add or subtract the representation’s direction in the residual stream and watch the model’s answer shift accordingly. Turns a correlation into demonstrated causation.",
+      verdict: "rules out — “it’s a passive correlate”"
+    },
+    {
+      name: "Internal reasoning",
+      asks: "Does the model compute over it?",
+      claim: "The representation is chained through intermediate steps, not just retrieved and emitted.",
+      how: "Use multi-step prompts where the concept must feed a later inference. If the representation participates mid-chain, it’s working material, not a one-shot lookup.",
+      verdict: "rules out — “it’s a single-step lookup”"
+    },
+    {
+      name: "Flexible generalization",
+      asks: "Does it transfer to the unseen?",
+      claim: "The same representation does its job in contexts the model never trained on.",
+      how: "Test the representation in novel domains, phrasings, or tasks. Transfer shows it’s a reusable, broadcastable unit — the defining property of a global workspace.",
+      verdict: "delivers — the actual “global” claim"
+    }
+  ];
+
+  function selTest(i){
+    var tabs = document.querySelectorAll('.test-tab');
+    tabs.forEach(function(t){ t.setAttribute('aria-selected', t.dataset.i == i ? 'true' : 'false'); });
+    var t = TESTS[i];
+    document.getElementById('tdetail').innerHTML =
+      '<p class="askswhat">asks: ' + t.asks + '</p>' +
+      '<p class="claim">' + t.claim + '</p>' +
+      '<p class="how">' + t.how + '</p>' +
+      '<p class="verdict"><b>' + t.verdict + '</b></p>';
+  }
+  selTest(0);
+
+  function reveal(id){
+    var el = document.getElementById(id);
+    if(el) el.classList.add('show');
+  }
+</script>

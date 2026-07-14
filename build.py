@@ -114,3 +114,4 @@ def build(fragment_path, out_path):
 if __name__ == "__main__":
     build(LESSONS / "_l1_body.html", LESSONS / "01-jacobian.html")
     build(LESSONS / "_l2_body.html", LESSONS / "02-jlens.html")
+    build(LESSONS / "_l3_body.html", LESSONS / "03-workspace-tests.html")
