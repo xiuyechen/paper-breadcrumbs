@@ -338,7 +338,7 @@
         <div id="toks"></div>
       </div>
     </div>
-    <p class="demo-note"><strong>Real output.</strong> These are genuine Jacobian-lens readouts &mdash; the pre-fitted <a href="https://github.com/anthropics/jacobian-lens" target="_blank" rel="noopener">neuronpedia lens</a> (<span class="v">qwen-n1000</span>) run on <span class="v">Qwen3.5-4B</span> for this exact prompt, read at the final position, top tokens by probability. Early layers show only formatting noise; by layer&nbsp;24 the <span class="out-word">currency</span> category has formed; by layer&nbsp;30 it resolves to <span class="out-word">&ldquo;Euro&rdquo;</span> &mdash; the model&rsquo;s thought climbing into words. (Raw JSON in the <a href="https://github.com/xiuyechen/paper-breadcrumbs/blob/main/tools/results.json" target="_blank" rel="noopener">repo</a>.)</p>
+    <p class="demo-note"><strong>Real output.</strong> These are genuine Jacobian-lens readouts &mdash; the pre-fitted <a href="https://github.com/anthropics/jacobian-lens" target="_blank" rel="noopener">neuronpedia lens</a> (<span class="v">qwen-n1000</span>) run on <span class="v">Qwen3.5-4B</span> for this exact prompt, read at the final position, top tokens by probability. The lens is noise through the first two-thirds of the stack; then at layer&nbsp;21 the <span class="out-word">currency</span> category snaps in (74%), by layer&nbsp;26 it is homing on the <span class="out-word">euro</span>, and by layer&nbsp;30 it resolves to <span class="out-word">&ldquo;Euro&rdquo;</span> &mdash; the model&rsquo;s thought climbing into words. Layers picked from a full 0&ndash;30 sweep. (Raw JSON in the <a href="https://github.com/xiuyechen/paper-breadcrumbs/blob/main/tools/sweep_all_layers.json" target="_blank" rel="noopener">repo</a>.)</p>
   </div>
 
   <h2><span class="num">5</span> Why the average (that&nbsp;<span class="serif" style="font-style:italic;">E</span>)</h2>
@@ -407,12 +407,15 @@
     var DPR = Math.min(window.devicePixelRatio||1, 2);
 
     // REAL Jacobian-lens output — neuronpedia/jacobian-lens@qwen-n1000 on Qwen3.5-4B,
-    // read at the final position ("is"), top tokens by softmax %. Watch the thought
-    // climb from formatting-noise -> the CURRENCY category -> "Euro". See tools/results.json.
+    // read at the final position ("is"), top tokens by softmax %. Layers chosen from a
+    // full 0-30 sweep (tools/sweep_all_layers.json) for the clearest four-stage story:
+    // formatting-noise -> the CURRENCY category snaps in -> homing on the euro -> "Euro".
+    // Percentages verbatim from the sweep; for L21/L26 the low-ranked CJK glosses
+    // (货币/欧元) and a whitespace-dup token are omitted for a clean English readout.
     var LAYERS = [
       {L:8,  name:"early &mdash; still formatting", toks:[["…",63.5],["…",14.2],["(blank)",9.7],["[…]",4.3],["\\",1.6]]},
-      {L:16, name:"mid &mdash; not yet conceptual", toks:[["\\n",42.3],[".\\",20.0],["____",15.6],["\\\"",5.1],["?\\",2.1]]},
-      {L:24, name:"mid-late &mdash; currency forms",toks:[["currency",48.1],["dollars",12.2],["euros",10.7],["Dollars",5.7],["Dollar",3.9]]},
+      {L:21, name:"mid &mdash; the category snaps in",toks:[["currency",74.3],["Currency",8.9],["currencies",1.4]]},
+      {L:26, name:"mid-late &mdash; homing on the euro",toks:[["euros",39.1],["euro",34.5],["Euro",12.7],["Euros",6.8]]},
       {L:30, name:"near the exit &mdash; &ldquo;Euro&rdquo;",toks:[["Euro",38.5],["the",18.2],["Euros",16.0],["euros",8.6],["euro",4.3]]}
     ];
     var sel = 3;
