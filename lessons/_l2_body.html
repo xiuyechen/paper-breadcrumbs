@@ -141,6 +141,14 @@
   }
   .demo h3 { font-family: var(--serif); font-size: 1.15rem; margin: 0 0 .3rem; font-weight: 600; }
   .demo .sub { color: var(--ink-soft); font-size: .95rem; margin: 0 0 1.3rem; }
+  .demo-note {
+    margin: 1.3rem 0 0; padding: .8rem 1rem;
+    border: 1px dashed var(--rule-strong); border-radius: 7px;
+    background: color-mix(in srgb, var(--in) 7%, transparent);
+    font-size: .84rem; line-height: 1.5; color: var(--ink-soft);
+  }
+  .demo-note strong { color: var(--in); }
+  .demo-note a { color: var(--accent); }
   .stage { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.3rem; align-items: center; }
   @media (max-width: 560px){ .stage { grid-template-columns: 1fr; } }
   canvas#stack { width: 100%; height: 300px; display: block; }
@@ -289,6 +297,7 @@
         <div id="toks"></div>
       </div>
     </div>
+    <p class="demo-note"><strong>Illustrative.</strong> These token percentages are a hand-set teaching mockup of a thought resolving into words &mdash; the mechanism and formula are faithful, but the numbers are not real model output. Running the actual <a href="https://github.com/anthropics/jacobian-lens" target="_blank" rel="noopener">J-lens code</a> on this prompt would replace them with genuine readouts.</p>
   </div>
 
   <h2><span class="num">5</span> Why the average (that&nbsp;<span class="serif" style="font-style:italic;">E</span>)</h2>
