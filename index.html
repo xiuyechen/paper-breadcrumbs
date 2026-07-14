@@ -170,7 +170,10 @@
     border-color: var(--out); color: var(--out);
     box-shadow: 0 0 0 5px color-mix(in srgb, var(--out) 16%, transparent);
   }
-  .paper-authors { font-style: italic; color: var(--ink-faint); font-family: var(--serif); font-size: .95rem; }
+  .paper-authors {
+    color: var(--ink-faint); font-family: var(--mono); font-size: .78rem;
+    letter-spacing: .02em; line-height: 1.6; margin: 0 0 .6rem;
+  }
   .dest-links { margin-top: 1rem; display: flex; gap: .6rem; flex-wrap: wrap; }
   .dest-links a {
     font-family: var(--mono); font-size: .72rem; letter-spacing: .03em;
@@ -258,7 +261,7 @@
       </div>
     </div>
 
-    <a class="node dest" href="https://transformer-circuits.pub/2026/workspace/index.html" target="_blank" rel="noopener">
+    <div class="node dest">
       <div class="marker">&#9873;</div>
       <div class="card">
         <p class="tag">the destination &mdash; the paper</p>
@@ -270,7 +273,7 @@
           <a href="https://github.com/anthropics/jacobian-lens" target="_blank" rel="noopener">code (J-lens) &#8599;</a>
         </div>
       </div>
-    </a>
+    </div>
 
   </main>
 
