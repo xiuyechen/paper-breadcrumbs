@@ -99,18 +99,19 @@
   }
   .meta b { color: var(--ink-soft); font-weight: 600; }
 
-  /* the trail */
+  /* the trail — connector drawn per-node so it never runs past/through the last card */
   .trail { position: relative; margin: 0; padding: 0; }
-  .trail::before {
-    content: ""; position: absolute; left: 27px; top: 34px; bottom: 90px;
-    width: 2px;
-    background: repeating-linear-gradient(var(--rule-strong) 0 6px, transparent 6px 13px);
-  }
   .node {
     position: relative; display: grid;
     grid-template-columns: 56px 1fr; gap: 0 1.3rem;
     padding: 0 0 2.2rem; align-items: start;
     text-decoration: none; color: inherit;
+  }
+  /* dotted segment from this node's marker down to the next; last node has none */
+  .node:not(:last-child)::before {
+    content: ""; position: absolute; left: 27px; top: 34px; bottom: -6px;
+    width: 2px; z-index: 0;
+    background: repeating-linear-gradient(var(--rule-strong) 0 6px, transparent 6px 13px);
   }
   .node .marker {
     position: relative; z-index: 2;
@@ -203,7 +204,7 @@
   @media (max-width: 540px) {
     .node { grid-template-columns: 44px 1fr; gap: 0 1rem; }
     .node .marker { width: 44px; height: 44px; font-size: .9rem; }
-    .trail::before { left: 21px; }
+    .node:not(:last-child)::before { left: 21px; }
   }
 </style>
 </head>
